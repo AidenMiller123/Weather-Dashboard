@@ -8,6 +8,18 @@ var apiUrl = 'https://api.openweathermap.org/data/2.5/weather?units=imperial&q=L
 var currentDay = dayjs().format('MM/DD/YYYY')
 
 
+var input = document.getElementById('searchInput')
+    searchButton.addEventListener('click', getAPI)
+    input.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            getAPI();
+        }
+    }        
+    );
+
+var searchHistory = document.getElementById("searchList")
+getHistory();
+
 var displayWeather = function (data) {
     var columnEl = document.createElement("div");
     var iconSrc = "https://openweathermap.org/img/w/" + data.weather[0].icon + ".png"
@@ -95,12 +107,58 @@ function displayForecast(data) {
 function getAPI() {
     var input = document.getElementById('searchInput')
     var userInput = input.value;
+    console.log("userInput: " + userInput)
+    if (userInput != null && userInput != "") {
+        savedSearches.push(userInput);
+        localStorage.setItem("searches", JSON.stringify(savedSearches));
+
+        input.value = "";
+        resultContent.innerHTML = "";
+
+        fetch('https://api.openweathermap.org/data/2.5/weather?units=imperial&q=' + userInput + '&APPID=dcf25649f21b3fd9928a7f7117382e65')
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                displayWeather(data);
+                getHistory();
+            })
+        fetch('https://api.openweathermap.org/data/2.5/forecast?units=imperial&q=' + userInput + '&APPID=dcf25649f21b3fd9928a7f7117382e65')
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                displayForecast(data);
+            })
+    }
+}
 
 
-    savedSearches.push(userInput);
-    localStorage.setItem("searches", JSON.stringify(savedSearches));
 
-    input.value = "";
+
+function getHistory() {
+    searchHistory.innerHTML = ""
+    var getStorage = JSON.parse(localStorage.getItem("searches")) ?? [];
+    for (let i = 0; i < getStorage.length; i++) {
+        var newLi = document.createElement("button")
+        newLi.setAttribute("id", "searches")  //Change 'searches' to 'getStorage[i]'
+        newLi.classList.add("bg-secondary", "mt-3", "bg-opacity-50", "ps-2", "fs-3")
+        newLi.textContent = getStorage[i];
+   //     newLi.addEventListener = ('click', getSavedSearchAPI(getStorage[i]));
+        searchHistory.append(newLi);
+
+    }
+    // if (getStorage.length > 0){
+    //     var savedSearchButton = document.getElementById("searches")
+    //     savedSearchButton.addEventListener('click', getSavedSearchAPI(getStorage[i]))
+    // }
+}
+
+function getSavedSearchAPI(cityName){
+
+    var userInput = cityName;
+    console.log("userInput: " + userInput)
+    
     resultContent.innerHTML = "";
 
     fetch('https://api.openweathermap.org/data/2.5/weather?units=imperial&q=' + userInput + '&APPID=dcf25649f21b3fd9928a7f7117382e65')
@@ -118,30 +176,6 @@ function getAPI() {
         .then(function (data) {
             displayForecast(data);
         })
+    
+
 }
-var input = document.getElementById('searchInput')
-searchButton.addEventListener('click', getAPI)
-input.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        getAPI();
-    }
-});
-var searchHistory = document.getElementById("searchList")
-function getHistory() {
-    searchHistory.innerHTML = ""
-    var getStorage = JSON.parse(localStorage.getItem("searches"));
-    console.log(getStorage.length);
-    for (let i = 0; i < getStorage.length; i++) {
-        var newLi = document.createElement("button")
-        newLi.setAttribute("id", "searches")
-        newLi.classList.add("bg-secondary", "mt-3", "bg-opacity-50", "ps-2", "fs-3")
-        newLi.textContent = getStorage[i];
-        searchHistory.append(newLi);
-
-    }
-}
-getHistory();
-
-var savedSearchButton = document.getElementById("searches")
-
-savedSearchButton.addEventListener('click', getAPI)
