@@ -1,0 +1,30 @@
+.card {
+    background-color: navy;
+    color: white;
+}
+
+#searchList {
+    list-style-type: none;
+}
+
+#searches {
+    border-radius: 4px;
+    border: 0;
+    width: 100%;
+}
+
+#searchButton {
+    margin-left: 6px;
+}
+
+#searchInput {
+    margin-left: 6px;
+    margin-right: 8px;
+    width: 99%;
+}
+
+#border {
+    border-bottom: solid 3px rgb(201, 197, 197);
+    margin-top: 15px;
+    margin-left: 30px;
+}
