@@ -7,25 +7,24 @@ var savedSearches = [];
 var apiUrl = 'https://api.openweathermap.org/data/2.5/weather?units=imperial&q=London,uk&APPID=dcf25649f21b3fd9928a7f7117382e65';
 var currentDay = dayjs().format('MM/DD/YYYY')
 
-
 var input = document.getElementById('searchInput')
-    searchButton.addEventListener('click', getAPI)
-    input.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            getAPI();
-        }
-    }        
-    );
+searchButton.addEventListener('click', getAPI)
+input.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        getAPI();
+    }
+}
+);
 
 var searchHistory = document.getElementById("searchList")
 getHistory();
+getSavedSearchAPI();
 
 var displayWeather = function (data) {
     var columnEl = document.createElement("div");
     var iconSrc = "https://openweathermap.org/img/w/" + data.weather[0].icon + ".png"
 
     columnEl.classList.add("mt-3", "fs-3", "border", "border-secondary", "ps-2")
-
 
     var currentWeather = document.createElement("div")
     currentWeather.classList.add("fw-bold")
@@ -34,10 +33,8 @@ var displayWeather = function (data) {
     var iconEl = document.createElement("img")
     iconEl.src = iconSrc
 
-
     var tempEl = document.createElement("p")
     tempEl.textContent = "Temp: " + data.main.temp + "\u00B0 F"
-
 
     var humidityEl = document.createElement("P")
     humidityEl.textContent = "Humidty: " + data.main.humidity + "%";
@@ -55,9 +52,7 @@ var displayWeather = function (data) {
 
 function displayForecast(data) {
 
-
     var forecastColumn = document.createElement("div")
-
 
     var forecastTitle = document.createElement('p')
     forecastTitle.classList.add('fw-bold', "fs-2")
@@ -65,8 +60,6 @@ function displayForecast(data) {
 
     var cards = document.createElement("div")
     cards.classList.add("row", "gap-5", "row-cols-1", "row-cols-sm-2", "row-cols-md-6", "ps-3")
-
-
 
     for (var i = 0; i < 40; i += 8) {
         var iconSrc = "https://openweathermap.org/img/w/" + data.list[i].weather[0].icon + ".png"
@@ -88,7 +81,6 @@ function displayForecast(data) {
         wind.textContent = "Wind: " + data.list[i].wind.speed + " MPH"
         wind.classList.add("pb-2")
 
-
         cards.append(card)
         card.append(date)
         card.append(icon)
@@ -96,7 +88,6 @@ function displayForecast(data) {
         card.append(humidity)
         card.append(wind)
     }
-
 
     resultContent.append(forecastColumn)
     forecastColumn.append(forecastTitle)
@@ -109,6 +100,7 @@ function getAPI() {
     var userInput = input.value;
     console.log("userInput: " + userInput)
     if (userInput != null && userInput != "") {
+
         savedSearches.push(userInput);
         localStorage.setItem("searches", JSON.stringify(savedSearches));
 
@@ -133,49 +125,41 @@ function getAPI() {
     }
 }
 
-
-
-
 function getHistory() {
     searchHistory.innerHTML = ""
     var getStorage = JSON.parse(localStorage.getItem("searches")) ?? [];
     for (let i = 0; i < getStorage.length; i++) {
         var newLi = document.createElement("button")
-        newLi.setAttribute("id", "searches")  //Change 'searches' to 'getStorage[i]'
-        newLi.classList.add("bg-secondary", "mt-3", "bg-opacity-50", "ps-2", "fs-3")
-        newLi.textContent = getStorage[i];
-   //     newLi.addEventListener = ('click', getSavedSearchAPI(getStorage[i]));
+        newLi.setAttribute("id", getStorage[i])
+        newLi.classList.add("bg-secondary", "mt-3", "bg-opacity-50", "ps-2", "fs-4")
+        var cityName = getStorage[i];
+        cityName = cityName.toUpperCase();
+        newLi.textContent = cityName
         searchHistory.append(newLi);
-
     }
-    // if (getStorage.length > 0){
-    //     var savedSearchButton = document.getElementById("searches")
-    //     savedSearchButton.addEventListener('click', getSavedSearchAPI(getStorage[i]))
-    // }
 }
 
-function getSavedSearchAPI(cityName){
+function getSavedSearchAPI(cityName) {
+    searchHistory.addEventListener("click", (event) => {
+        if (event.target.tagName === 'BUTTON') {
+            var userInput = event.target.id;
+            resultContent.innerHTML = "";
 
-    var userInput = cityName;
-    console.log("userInput: " + userInput)
-    
-    resultContent.innerHTML = "";
-
-    fetch('https://api.openweathermap.org/data/2.5/weather?units=imperial&q=' + userInput + '&APPID=dcf25649f21b3fd9928a7f7117382e65')
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            displayWeather(data);
-            getHistory();
-        })
-    fetch('https://api.openweathermap.org/data/2.5/forecast?units=imperial&q=' + userInput + '&APPID=dcf25649f21b3fd9928a7f7117382e65')
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            displayForecast(data);
-        })
-    
-
+            fetch('https://api.openweathermap.org/data/2.5/weather?units=imperial&q=' + userInput + '&APPID=dcf25649f21b3fd9928a7f7117382e65')
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    displayWeather(data);
+                    getHistory();
+                })
+            fetch('https://api.openweathermap.org/data/2.5/forecast?units=imperial&q=' + userInput + '&APPID=dcf25649f21b3fd9928a7f7117382e65')
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    displayForecast(data);
+                })
+        }
+    })
 }
