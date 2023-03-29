@@ -1,29 +1,30 @@
+/* Styles the cards for 5 day forecast */
 .card {
     background-color: navy;
     color: white;
 }
-
+/* styles buttons list for search history */
 #searchList {
     list-style-type: none;
     width: 100%;
 }
-
+/* styles each button specifically in the search history list*/
 .bg-secondary {
     border-radius: 4px;
     border: 0;
     width: 100%;
 }
-
+/* positions the search button */
 #searchButton {
     margin-left: 6px;
 }
-
+/* positions and styles the input box */
 #searchInput {
     margin-left: 6px;
     margin-right: 8px;
     width: 99%;
 }
-
+/* creates the line the seperates the search list from the input bar and search button  */
 #border {
     border-bottom: solid 3px rgb(201, 197, 197);
     margin-top: 15px;
